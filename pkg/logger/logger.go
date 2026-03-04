@@ -145,6 +145,46 @@ func logMessage(level LogLevel, component string, message string, fields map[str
 	}
 }
 
+
+// sanitizeLogMessage sanitizes a log message by masking sensitive data
+func sanitizeLogMessage(message string) string {
+	if logMasker != nil {
+		return logMasker.MaskString(message)
+	}
+	return message
+}
+
+// sanitizeLogFields sanitizes log fields by masking sensitive data in values
+func sanitizeLogFields(fields map[string]any) map[string]any {
+	if logMasker == nil || fields == nil {
+		return fields
+	}
+
+	result := make(map[string]any)
+	for k, v := range fields {
+		switch val := v.(type) {
+		case string:
+			result[k] = logMasker.MaskString(val)
+		case map[string]any:
+			result[k] = sanitizeLogFields(val)
+		case []any:
+			sanitized := make([]any, len(val))
+			for i, item := range val {
+				if str, ok := item.(string); ok {
+					sanitized[i] = logMasker.MaskString(str)
+				} else {
+					sanitized[i] = item
+				}
+			}
+			result[k] = sanitized
+		default:
+			result[k] = v
+		}
+	}
+	return result
+}
+
+
 func formatComponent(component string) string {
 	if component == "" {
 		return ""
