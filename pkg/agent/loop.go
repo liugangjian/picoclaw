@@ -277,7 +277,7 @@ func (al *AgentLoop) Run(ctx context.Context) error {
 					response = fmt.Sprintf("Error processing message: %v", err)
 				}
 
-				if response != "" {
+				if response != "" && msg.Channel != "system" {
 					// Check if the message tool already sent a response during this round.
 					// If so, skip publishing to avoid duplicate messages to the user.
 					// Use default agent's tools to check (message tool is shared).
