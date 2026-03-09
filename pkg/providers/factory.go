@@ -219,11 +219,6 @@ func resolveProviderSelection(cfg *config.Config) (providerSelection, error) {
 			strings.HasPrefix(model, "deepseek/") ||
 			strings.HasPrefix(model, "deepseek-ai/") ||
 			strings.HasPrefix(model, "google/"):
-			strings.HasPrefix(model, "anthropic/") ||
-			strings.HasPrefix(model, "openai/") ||
-			strings.HasPrefix(model, "meta-llama/") ||
-			strings.HasPrefix(model, "deepseek/") ||
-			strings.HasPrefix(model, "google/"):
 			sel.apiKey = cfg.Providers.OpenRouter.APIKey
 			sel.proxy = cfg.Providers.OpenRouter.Proxy
 			if cfg.Providers.OpenRouter.APIBase != "" {
@@ -306,13 +301,13 @@ func resolveProviderSelection(cfg *config.Config) (providerSelection, error) {
 			if sel.apiBase == "" {
 				sel.apiBase = "https://api.mistral.ai/v1"
 			}
-		case (strings.Contains(lowerModel, "deepseek") || strings.HasPrefix(model, "deepseek/") || strings.HasPrefix(model, "deepseek-ai/")) && cfg.Providers.DeepSeek.APIKey != "":
-			sel.apiKey = cfg.Providers.DeepSeek.APIKey
-			sel.apiBase = cfg.Providers.DeepSeek.APIBase
-			sel.proxy = cfg.Providers.DeepSeek.Proxy
-			if sel.apiBase == "" {
-				sel.apiBase = "https://api.deepseek.com/v1"
-			}
+	case (strings.Contains(lowerModel, "deepseek") || strings.HasPrefix(model, "deepseek/") || strings.HasPrefix(model, "deepseek-ai/")) && cfg.Providers.DeepSeek.APIKey != "":
+		sel.apiKey = cfg.Providers.DeepSeek.APIKey
+		sel.apiBase = cfg.Providers.DeepSeek.APIBase
+		sel.proxy = cfg.Providers.DeepSeek.Proxy
+		if sel.apiBase == "" {
+			sel.apiBase = "https://api.deepseek.com/v1"
+		}
 		case cfg.Providers.VLLM.APIBase != "":
 			sel.apiKey = cfg.Providers.VLLM.APIKey
 			sel.apiBase = cfg.Providers.VLLM.APIBase
