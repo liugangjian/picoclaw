@@ -324,9 +324,29 @@ func resolveProviderSelection(cfg *config.Config) (providerSelection, error) {
 			return providerSelection{}, fmt.Errorf("no API key configured for provider (model: %s)", model)
 		}
 		if sel.apiBase == "" {
-			return providerSelection{}, fmt.Errorf("no API base configured for provider (model: %s)", model)
+			// Rather than defaulting to a specific provider (including GLM), we'll prioritize
+			// the first configured provider base in a consistent order
+			// This prevents default always choosing GLM provider when it shouldn't
+			orderedBases := []string{
+				cfg.Providers.OpenAI.APIBase,
+				cfg.Providers.Anthropic.APIBase,
+				cfg.Providers.Gemini.APIBase,
+				cfg.Providers.Groq.APIBase,
+				cfg.Providers.Zhipu.APIBase, // The GLM provider is lower in the order to prevent automatic defaulting
+				cfg.Providers.OpenRouter.APIBase,
+				cfg.Providers.LiteLLM.APIBase,
+				cfg.Providers.VLLM.APIBase,
+			}
+			for _, base := range orderedBases {
+				if base != "" {
+					sel.apiBase = base
+					break
+				}
+			}
+			if sel.apiBase == "" {
+				return providerSelection{}, fmt.Errorf("no API base configured for provider (model: %s)", model)
+			}
 		}
 	}
-
 	return sel, nil
 }
